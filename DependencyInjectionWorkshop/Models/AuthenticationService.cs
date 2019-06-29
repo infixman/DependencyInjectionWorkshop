@@ -72,11 +72,21 @@ namespace DependencyInjectionWorkshop.Models
             var addFailedCountResponse = new HttpClient() { BaseAddress = new Uri("http://joey.com/") }.PostAsJsonAsync("api/failedCounter/Add", account).Result;
             addFailedCountResponse.EnsureSuccessStatusCode();
         }
+
+        public int GetFailedCount(string account)
+        {
+            var failedCountResponse =
+                new HttpClient() {BaseAddress = new Uri("http://joey.com/")}
+                    .PostAsJsonAsync("api/failedCounter/GetFailedCount", account).Result;
+            failedCountResponse.EnsureSuccessStatusCode();
+            var failedCount = failedCountResponse.Content.ReadAsAsync<int>().Result;
+            return failedCount;
+        }
     }
 
     public class SlackAdapter
     {
-        private void PushMessage(string account)
+        public void PushMessage(string account)
         {
             var slackClient = new SlackClient("my api token");
             slackClient.PostMessage(slackResponse => { }, "my channel", $"{account} message", "my bot name");
@@ -125,7 +135,7 @@ namespace DependencyInjectionWorkshop.Models
                 _failedCounter.AddFailedCount(account);
 
                 //紀錄錯誤次數
-                LogFailedCount(account);
+                LogFailedCount(account, _failedCounter.GetFailedCount(account));
 
                 return false;
             }
@@ -139,13 +149,8 @@ namespace DependencyInjectionWorkshop.Models
             return isLocked;
         }
 
-        private static void LogFailedCount(string account)
+        private static void LogFailedCount(string account, int failedCount)
         {
-            var failedCountResponse =
-                new HttpClient() { BaseAddress = new Uri("http://joey.com/") }.PostAsJsonAsync("api/failedCounter/GetFailedCount", account).Result;
-            failedCountResponse.EnsureSuccessStatusCode();
-            var failedCount = failedCountResponse.Content.ReadAsAsync<int>().Result;
-
             //LOG錯誤次數
             var logger = NLog.LogManager.GetCurrentClassLogger();
             logger.Info($"accountId:{account} failed times:{failedCount}");
