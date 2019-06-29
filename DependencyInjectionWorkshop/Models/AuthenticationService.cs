@@ -46,9 +46,8 @@ namespace DependencyInjectionWorkshop.Models
                 PushMessage();
 
                 //增加錯誤次數
-                var addFailedCountResponse = httpClient.PostAsJsonAsync("api/failedCounter/Add", account).Result;
-                addFailedCountResponse.EnsureSuccessStatusCode();
-                
+                AddFailedCount(account, httpClient);
+
                 //取得最新錯誤次數
                 var failedCountResponse =
                     httpClient.PostAsJsonAsync("api/failedCounter/GetFailedCount", account).Result;
@@ -61,6 +60,12 @@ namespace DependencyInjectionWorkshop.Models
 
                 return false;
             }
+        }
+
+        private static void AddFailedCount(string account, HttpClient httpClient)
+        {
+            var addFailedCountResponse = httpClient.PostAsJsonAsync("api/failedCounter/Add", account).Result;
+            addFailedCountResponse.EnsureSuccessStatusCode();
         }
 
         private static void PushMessage()
