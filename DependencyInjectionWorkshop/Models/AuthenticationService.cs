@@ -43,7 +43,7 @@ namespace DependencyInjectionWorkshop.Models
             var pwdFromDb = _profile.GetPassword(account);
 
             //將使用者輸入的密碼HASH一下
-            var hashPwd = _hash.Hash(password);
+            var hashPwd = _hash.Compute(password);
 
             //從API取得目前的OTP
             var otpFromApi = _otpService.GetCurrentOtp(account);
