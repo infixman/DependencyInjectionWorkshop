@@ -10,6 +10,7 @@ namespace DependencyInjectionWorkshopTests
         public void is_valid()
         {
             var authenticationService = new AuthenticationService();
+            //安安
         }
     }
 }
