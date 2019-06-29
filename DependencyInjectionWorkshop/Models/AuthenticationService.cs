@@ -20,7 +20,13 @@ namespace DependencyInjectionWorkshop.Models
 
         public bool Verify(string account, string password, string otp)
         {
-            throw new NotImplementedException();
+            var isValid = _authentication.Verify(account, password, otp);
+            if (!isValid)
+            {
+                _notification.PushMessage(account);
+            }
+
+            return isValid;
         }
     }
 
