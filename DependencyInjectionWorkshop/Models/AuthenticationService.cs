@@ -4,8 +4,11 @@ namespace DependencyInjectionWorkshop.Models
 {
     public class FailedCounterDecorator
     {
-        private static void CheckAccIsLocked(string account, IFailedCounter failedCounter)
+        private IFailedCounter _failedCounter;
+
+        private void CheckAccIsLocked(string account, IFailedCounter failedCounter)
         {
+            _failedCounter = failedCounter;
             if (failedCounter.IsAccountLocked(account))
             {
                 throw new FailedTooManyTimesException();
