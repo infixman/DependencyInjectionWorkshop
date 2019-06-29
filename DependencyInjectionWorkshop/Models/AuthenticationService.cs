@@ -40,10 +40,30 @@ namespace DependencyInjectionWorkshop.Models
         }
     }
 
+    public class OtpService
+    {
+        public string GetCurrentOtp(string account)
+        {
+            string otpFromApi;
+            var response = new HttpClient() { BaseAddress = new Uri("http://joey.com/") }.PostAsJsonAsync("api/otps", account).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                otpFromApi = response.Content.ReadAsAsync<string>().Result;
+            }
+            else
+            {
+                throw new Exception($"web api error, account:{account}");
+            }
+
+            return otpFromApi;
+        }
+    }
+
     public class AuthenticationService
     {
         private readonly ProfileDao _profileDao = new ProfileDao();
         private readonly Sha256Adapter _sha256Adapter = new Sha256Adapter();
+        private readonly OtpService _otpService = new OtpService();
 
         public bool Verify(string account, string password, string otp)
         {
@@ -61,7 +81,7 @@ namespace DependencyInjectionWorkshop.Models
             var hashPwd = _sha256Adapter.Hash(password);
 
             //從API取得目前的OTP
-            var otpFromApi = GetCurrentOtp(account);
+            var otpFromApi = _otpService.GetCurrentOtp(account);
 
             //檢查使用者輸入的密碼&OTP正確性
             if (pwdFromDb == hashPwd && otpFromApi == otp)
@@ -121,22 +141,6 @@ namespace DependencyInjectionWorkshop.Models
         {
             var resetResponse = new HttpClient() { BaseAddress = new Uri("http://joey.com/") }.PostAsJsonAsync("api/failedCounter/Reset", account).Result;
             resetResponse.EnsureSuccessStatusCode();
-        }
-
-        private static string GetCurrentOtp(string account)
-        {
-            string otpFromApi;
-            var response = new HttpClient() { BaseAddress = new Uri("http://joey.com/") }.PostAsJsonAsync("api/otps", account).Result;
-            if (response.IsSuccessStatusCode)
-            {
-                otpFromApi = response.Content.ReadAsAsync<string>().Result;
-            }
-            else
-            {
-                throw new Exception($"web api error, account:{account}");
-            }
-
-            return otpFromApi;
         }
     }
 
