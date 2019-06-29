@@ -88,9 +88,19 @@ namespace DependencyInjectionWorkshopTests
         [Test]
         public void account_is_lock()
         {
-            _failedCounter.IsAccountLocked(DefaultAccount).ReturnsForAnyArgs(true);
+            GivenAccountIsLocked();
+            ShouldThorwsException();
+        }
+
+        private void ShouldThorwsException()
+        {
             TestDelegate action = () => WhenValid();
             Assert.Throws<FailedTooManyTimesException>(action);
+        }
+
+        private void GivenAccountIsLocked()
+        {
+            _failedCounter.IsAccountLocked(DefaultAccount).ReturnsForAnyArgs(true);
         }
 
         private void ShouldLog(string account)
