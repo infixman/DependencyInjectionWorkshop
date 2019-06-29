@@ -19,10 +19,9 @@ namespace DependencyInjectionWorkshop.Models
             return _authentication.Verify(account, password, otp);
         }
 
-        private void CheckAccountIsLocked(string accountId)
+        private void CheckAccountIsLocked(string account)
         {
-            var isLocked = _failedCounter.IsAccountLocked(accountId);
-            if (isLocked)
+            if (_failedCounter.IsAccountLocked(account))
             {
                 throw new FailedTooManyTimesException();
             }
