@@ -2,6 +2,14 @@
 
 namespace DependencyInjectionWorkshop.Models
 {
+    public class NotificationDecorator
+    {
+        public static void PushMsg(string account, INotification notification)
+        {
+            notification.PushMessage(account);
+        }
+    }
+
     public class AuthenticationService : IAuthentication
     {
         private readonly IProfile _profile;
@@ -58,7 +66,7 @@ namespace DependencyInjectionWorkshop.Models
             else //驗證失敗
             {
                 //打SLACK通知使用者
-                PushMsg(account, _notification);
+                NotificationDecorator.PushMsg(account, _notification);
 
                 //增加錯誤次數
                 _failedCounter.AddFailedCount(account);
@@ -69,11 +77,6 @@ namespace DependencyInjectionWorkshop.Models
 
                 return false;
             }
-        }
-
-        private static void PushMsg(string account, INotification notification)
-        {
-            notification.PushMessage(account);
         }
     }
 
