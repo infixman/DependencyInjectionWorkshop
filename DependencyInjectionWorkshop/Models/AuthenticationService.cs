@@ -16,10 +16,8 @@ namespace DependencyInjectionWorkshop.Models
             var httpClient = new HttpClient() { BaseAddress = new Uri("http://joey.com/") };
 
             //檢查帳號是否被鎖定
-            var isLockedResponse = httpClient.PostAsJsonAsync("api/failedCounter/IsLocked", account).Result;
-            isLockedResponse.EnsureSuccessStatusCode();
-
-            if (isLockedResponse.Content.ReadAsAsync<bool>().Result)
+            var isLocked = IsLocked(account, httpClient);
+            if (isLocked)
             {
                 throw new FailedTooManyTimesException();
             }
@@ -53,6 +51,14 @@ namespace DependencyInjectionWorkshop.Models
 
                 return false;
             }
+        }
+
+        private static bool IsLocked(string account, HttpClient httpClient)
+        {
+            var isLockedResponse = httpClient.PostAsJsonAsync("api/failedCounter/IsLocked", account).Result;
+            isLockedResponse.EnsureSuccessStatusCode();
+            var isLocked = isLockedResponse.Content.ReadAsAsync<bool>().Result;
+            return isLocked;
         }
 
         private static void LogFailedCount(string account, HttpClient httpClient)
