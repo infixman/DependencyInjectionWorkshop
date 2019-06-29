@@ -58,7 +58,7 @@ namespace DependencyInjectionWorkshop.Models
             else //驗證失敗
             {
                 //打SLACK通知使用者
-                PushMsg(account);
+                PushMsg(account, _notification);
 
                 //增加錯誤次數
                 _failedCounter.AddFailedCount(account);
@@ -71,9 +71,9 @@ namespace DependencyInjectionWorkshop.Models
             }
         }
 
-        private void PushMsg(string account)
+        private void PushMsg(string account, INotification notification)
         {
-            _notification.PushMessage(account);
+            notification.PushMessage(account);
         }
     }
 
