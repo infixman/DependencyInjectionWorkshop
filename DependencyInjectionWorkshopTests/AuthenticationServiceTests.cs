@@ -7,6 +7,10 @@ namespace DependencyInjectionWorkshopTests
     [TestFixture]
     public class AuthenticationServiceTests
     {
+        private const string DefaultPassword = "9487";
+        private const string DefaultHashPassword = "abc";
+        private const string DefaultAccount = "joey";
+        private const string DefaultOtp = "9527";
         private IProfile _profile;
         private IHash _hash;
         private IOtpService _otpService;
@@ -30,16 +34,40 @@ namespace DependencyInjectionWorkshopTests
                     _notification, _logger);
         }
 
-
         [Test]
         public void is_valid()
         {
-            _profile.GetPassword("joey").ReturnsForAnyArgs("abc");
-            _hash.Compute("9487").ReturnsForAnyArgs("abc");
-            _otpService.GetCurrentOtp("joey").ReturnsForAnyArgs("9527");
+            GivenPasswordFromDb(DefaultAccount, DefaultHashPassword);
+            GivenHashedPassword(DefaultPassword, DefaultHashPassword);
+            GivenOtp(DefaultAccount, DefaultOtp);
 
-            var isValid = _authenticationService.Verify("joey", "9487", "9527");
+            var isValid = WhenValid(DefaultAccount, DefaultPassword, DefaultOtp);
+            ShouldBeValid(isValid);
+        }
+
+        private static void ShouldBeValid(bool isValid)
+        {
             Assert.IsTrue(isValid);
+        }
+
+        private bool WhenValid(string account, string password, string otp)
+        {
+            return _authenticationService.Verify(account, password, otp);
+        }
+
+        private void GivenOtp(string account, string otp)
+        {
+            _otpService.GetCurrentOtp(account).ReturnsForAnyArgs(otp);
+        }
+
+        private void GivenHashedPassword(string password, string hashedPassword)
+        {
+            _hash.Compute(password).ReturnsForAnyArgs(hashedPassword);
+        }
+
+        private void GivenPasswordFromDb(string account, string hashedPassword)
+        {
+            _profile.GetPassword(account).ReturnsForAnyArgs(hashedPassword);
         }
     }
 }
