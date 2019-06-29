@@ -2,7 +2,7 @@
 
 namespace DependencyInjectionWorkshop.Models
 {
-    public class FailedCounterDecorator
+    public class FailedCounterDecorator : IAuthentication
     {
         private readonly IFailedCounter _failedCounter;
 
@@ -17,6 +17,11 @@ namespace DependencyInjectionWorkshop.Models
             {
                 throw new FailedTooManyTimesException();
             }
+        }
+
+        public bool Verify(string account, string password, string otp)
+        {
+            throw new NotImplementedException();
         }
     }
 
