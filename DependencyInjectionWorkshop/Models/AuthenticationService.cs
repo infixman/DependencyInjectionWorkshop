@@ -25,20 +25,19 @@ namespace DependencyInjectionWorkshop.Models
             }
 
             //從DB撈使用者密碼
-            var pwdHashFromDb = GetPwdHashFromDb(account);
+            var pwdFromDb = GetPwdFromDb(account);
 
             //將使用者輸入的密碼HASH一下
-            var pwdHashFromInput = GetPwdHashFromInput(password);
+            var hashPwd = GetHashPwd(password);
 
             //從API取得目前的OTP
-            var otpFromApi = GetOtpFromApi(account, httpClient);
+            var otpFromApi = GetCurrentOtp(account, httpClient);
 
             //檢查使用者輸入的密碼&OTP正確性
-            if (pwdHashFromDb == pwdHashFromInput && otpFromApi == otp)
+            if (pwdFromDb == hashPwd && otpFromApi == otp)
             {
                 //驗證成功，歸零錯誤次數
-                var resetResponse = httpClient.PostAsJsonAsync("api/failedCounter/Reset", account).Result;
-                resetResponse.EnsureSuccessStatusCode();
+                ResetFailedCount(account, httpClient);
                 return true;
             }
             else //驗證失敗
@@ -65,7 +64,13 @@ namespace DependencyInjectionWorkshop.Models
             }
         }
 
-        private static string GetOtpFromApi(string account, HttpClient httpClient)
+        private static void ResetFailedCount(string account, HttpClient httpClient)
+        {
+            var resetResponse = httpClient.PostAsJsonAsync("api/failedCounter/Reset", account).Result;
+            resetResponse.EnsureSuccessStatusCode();
+        }
+
+        private static string GetCurrentOtp(string account, HttpClient httpClient)
         {
             string otpFromApi;
             var response = httpClient.PostAsJsonAsync("api/otps", account).Result;
@@ -81,7 +86,7 @@ namespace DependencyInjectionWorkshop.Models
             return otpFromApi;
         }
 
-        private static string GetPwdHashFromInput(string password)
+        private static string GetHashPwd(string password)
         {
             var crypt = new System.Security.Cryptography.SHA256Managed();
             var hash = new StringBuilder();
@@ -95,7 +100,7 @@ namespace DependencyInjectionWorkshop.Models
             return pwdHashFromInput;
         }
 
-        private static string GetPwdHashFromDb(string account)
+        private static string GetPwdFromDb(string account)
         {
             string pwdHashFromDb;
             using (var connection = new SqlConnection("my connection string"))
