@@ -70,6 +70,28 @@ namespace DependencyInjectionWorkshopTests
             ShouldAddFailCount(DefaultAccount);
         }
 
+        [Test]
+        public void should_reset_fail_count_when_valid()
+        {
+            WhenValid();
+            ShouldResetFailCount(DefaultAccount);
+        }
+
+        private void ShouldResetFailCount(string account)
+        {
+            _failedCounter.Received().ResetFailedCount(account);
+        }
+
+        private bool WhenValid()
+        {
+            GivenPasswordFromDb(DefaultAccount, DefaultHashPassword);
+            GivenHashedPassword(DefaultInputPassword, DefaultHashPassword);
+            GivenOtp(DefaultAccount, DefaultOtp);
+
+            var isValid = WhenValid(DefaultAccount, DefaultInputPassword, DefaultOtp);
+            return isValid;
+        }
+
         private void ShouldAddFailCount(string account)
         {
             _failedCounter.Received().AddFailedCount(account);
