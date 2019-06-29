@@ -66,6 +66,12 @@ namespace DependencyInjectionWorkshop.Models
             var resetResponse = new HttpClient() { BaseAddress = new Uri("http://joey.com/") }.PostAsJsonAsync("api/failedCounter/Reset", account).Result;
             resetResponse.EnsureSuccessStatusCode();
         }
+
+        public void AddFailedCount(string account)
+        {
+            var addFailedCountResponse = new HttpClient() { BaseAddress = new Uri("http://joey.com/") }.PostAsJsonAsync("api/failedCounter/Add", account).Result;
+            addFailedCountResponse.EnsureSuccessStatusCode();
+        }
     }
 
     public class AuthenticationService
@@ -106,7 +112,7 @@ namespace DependencyInjectionWorkshop.Models
                 PushMessage(account);
 
                 //增加錯誤次數
-                AddFailedCount(account);
+                _failedCounter.AddFailedCount(account);
 
                 //紀錄錯誤次數
                 LogFailedCount(account);
@@ -133,12 +139,6 @@ namespace DependencyInjectionWorkshop.Models
             //LOG錯誤次數
             var logger = NLog.LogManager.GetCurrentClassLogger();
             logger.Info($"accountId:{account} failed times:{failedCount}");
-        }
-
-        private static void AddFailedCount(string account)
-        {
-            var addFailedCountResponse = new HttpClient() { BaseAddress = new Uri("http://joey.com/") }.PostAsJsonAsync("api/failedCounter/Add", account).Result;
-            addFailedCountResponse.EnsureSuccessStatusCode();
         }
 
         private static void PushMessage(string account)
