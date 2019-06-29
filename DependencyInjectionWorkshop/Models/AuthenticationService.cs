@@ -73,7 +73,7 @@ namespace DependencyInjectionWorkshop.Models
             else //驗證失敗
             {
                 //打SLACK通知使用者
-                PushMessage();
+                PushMessage(account);
 
                 //增加錯誤次數
                 AddFailedCount(account);
@@ -111,10 +111,10 @@ namespace DependencyInjectionWorkshop.Models
             addFailedCountResponse.EnsureSuccessStatusCode();
         }
 
-        private static void PushMessage()
+        private static void PushMessage(string account)
         {
             var slackClient = new SlackClient("my api token");
-            slackClient.PostMessage(slackResponse => { }, "my channel", "my message", "my bot name");
+            slackClient.PostMessage(slackResponse => { }, "my channel", $"{account} message", "my bot name");
         }
 
         private static void ResetFailedCount(string account)
