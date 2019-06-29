@@ -6,10 +6,9 @@ namespace DependencyInjectionWorkshop.Models
     {
         private IFailedCounter _failedCounter;
 
-        private void CheckAccIsLocked(string account, IFailedCounter failedCounter)
+        private void CheckAccIsLocked(string account)
         {
-            _failedCounter = failedCounter;
-            if (failedCounter.IsAccountLocked(account))
+            if (_failedCounter.IsAccountLocked(account))
             {
                 throw new FailedTooManyTimesException();
             }
