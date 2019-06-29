@@ -9,9 +9,10 @@ namespace DependencyInjectionWorkshopTests
     public class AuthenticationServiceTests
     {
         private const string DefaultInputPassword = "9487";
-        private const string DefaultHashPassword = "abc";
+        private const string DefaultHashPassword = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad";
         private const string DefaultAccount = "joey";
         private const string DefaultOtp = "9527";
+
         private IProfile _profile;
         private IHash _hash;
         private IOtpService _otpService;
