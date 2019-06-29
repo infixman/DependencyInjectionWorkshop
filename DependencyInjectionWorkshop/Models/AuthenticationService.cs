@@ -53,7 +53,6 @@ namespace DependencyInjectionWorkshop.Models
             _hash = new Sha256Adapter();
             _otpService = new OtpService();
             _failedCounter = new FailedCounter();
-            new SlackAdapter();
             _logger = new NLogAdapter();
         }
 
