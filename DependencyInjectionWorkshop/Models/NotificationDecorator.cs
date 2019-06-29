@@ -11,11 +11,6 @@
             _notification = notification;
         }
 
-        public static void PushMsg(string account)
-        {
-            _notification.PushMessage(account);
-        }
-
         public bool Verify(string account, string password, string otp)
         {
             var isValid = _authentication.Verify(account, password, otp);
