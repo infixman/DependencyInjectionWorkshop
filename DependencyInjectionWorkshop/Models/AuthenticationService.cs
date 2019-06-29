@@ -95,11 +95,11 @@ namespace DependencyInjectionWorkshop.Models
 
     public class NLogAdapter
     {
-        public void Info(string account, int failedCount)
+        public void Info(string message)
         {
             //LOG錯誤次數
             var logger = NLog.LogManager.GetCurrentClassLogger();
-            logger.Info($"accountId:{account} failed times:{failedCount}");
+            logger.Info(message);
         }
     }
 
@@ -146,7 +146,8 @@ namespace DependencyInjectionWorkshop.Models
                 _failedCounter.AddFailedCount(account);
 
                 //紀錄錯誤次數
-                _nLogAdapter.Info(account, _failedCounter.GetFailedCount(account));
+                var failedCount = _failedCounter.GetFailedCount(account);
+                _nLogAdapter.Info($"accountId:{account} failed times:{failedCount}");
 
                 return false;
             }
