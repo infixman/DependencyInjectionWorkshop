@@ -24,16 +24,31 @@ namespace DependencyInjectionWorkshop.Models
         }
     }
 
+    public class Sha256Adapter
+    {
+        public string Hash(string plainText)
+        {
+            var crypt = new System.Security.Cryptography.SHA256Managed();
+            var hash = new StringBuilder();
+            var crypto = crypt.ComputeHash(Encoding.UTF8.GetBytes(plainText));
+            foreach (var theByte in crypto)
+            {
+                hash.Append(theByte.ToString("x2"));
+            }
+
+            return hash.ToString();
+        }
+    }
+
     public class AuthenticationService
     {
         private readonly ProfileDao _profileDao = new ProfileDao();
+        private readonly Sha256Adapter _sha256Adapter = new Sha256Adapter();
 
         public bool Verify(string account, string password, string otp)
         {
-            var httpClient = new HttpClient() { BaseAddress = new Uri("http://joey.com/") };
-
             //檢查帳號是否被鎖定
-            var isLocked = IsAccountLocked(account, httpClient);
+            var isLocked = IsAccountLocked(account, new HttpClient() { BaseAddress = new Uri("http://joey.com/") });
             if (isLocked)
             {
                 throw new FailedTooManyTimesException();
@@ -43,16 +58,16 @@ namespace DependencyInjectionWorkshop.Models
             var pwdFromDb = _profileDao.GetPassword(account);
 
             //將使用者輸入的密碼HASH一下
-            var hashPwd = GetHashPwd(password);
+            var hashPwd = _sha256Adapter.Hash(password);
 
             //從API取得目前的OTP
-            var otpFromApi = GetCurrentOtp(account, httpClient);
+            var otpFromApi = GetCurrentOtp(account, new HttpClient() { BaseAddress = new Uri("http://joey.com/") });
 
             //檢查使用者輸入的密碼&OTP正確性
             if (pwdFromDb == hashPwd && otpFromApi == otp)
             {
                 //驗證成功，歸零錯誤次數
-                ResetFailedCount(account, httpClient);
+                ResetFailedCount(account, new HttpClient() { BaseAddress = new Uri("http://joey.com/") });
                 return true;
             }
             else //驗證失敗
@@ -61,10 +76,10 @@ namespace DependencyInjectionWorkshop.Models
                 PushMessage();
 
                 //增加錯誤次數
-                AddFailedCount(account, httpClient);
+                AddFailedCount(account, new HttpClient() { BaseAddress = new Uri("http://joey.com/") });
 
                 //紀錄錯誤次數
-                LogFailedCount(account, httpClient);
+                LogFailedCount(account, new HttpClient() { BaseAddress = new Uri("http://joey.com/") });
 
                 return false;
             }
@@ -122,20 +137,6 @@ namespace DependencyInjectionWorkshop.Models
             }
 
             return otpFromApi;
-        }
-
-        private static string GetHashPwd(string password)
-        {
-            var crypt = new System.Security.Cryptography.SHA256Managed();
-            var hash = new StringBuilder();
-            var crypto = crypt.ComputeHash(Encoding.UTF8.GetBytes(password));
-            foreach (var theByte in crypto)
-            {
-                hash.Append(theByte.ToString("x2"));
-            }
-
-            var pwdHashFromInput = hash.ToString();
-            return pwdHashFromInput;
         }
     }
 
