@@ -9,21 +9,38 @@ using SlackAPI;
 
 namespace DependencyInjectionWorkshop.Models
 {
+    public class ProfileDao
+    {
+        public string GetPwdFromDb(string account)
+        {
+            string pwdHashFromDb;
+            using (var connection = new SqlConnection("my connection string"))
+            {
+                pwdHashFromDb = connection.Query<string>("spGetUserPassword", new {Id = account},
+                    commandType: CommandType.StoredProcedure).SingleOrDefault();
+            }
+
+            return pwdHashFromDb;
+        }
+    }
+
     public class AuthenticationService
     {
+        private readonly ProfileDao _profileDao = new ProfileDao();
+
         public bool Verify(string account, string password, string otp)
         {
             var httpClient = new HttpClient() { BaseAddress = new Uri("http://joey.com/") };
 
             //檢查帳號是否被鎖定
-            var isLocked = IsLocked(account, httpClient);
+            var isLocked = IsAccountLocked(account, httpClient);
             if (isLocked)
             {
                 throw new FailedTooManyTimesException();
             }
 
             //從DB撈使用者密碼
-            var pwdFromDb = GetPwdFromDb(account);
+            var pwdFromDb = _profileDao.GetPwdFromDb(account);
 
             //將使用者輸入的密碼HASH一下
             var hashPwd = GetHashPwd(password);
@@ -53,9 +70,9 @@ namespace DependencyInjectionWorkshop.Models
             }
         }
 
-        private static bool IsLocked(string account, HttpClient httpClient)
+        private static bool IsAccountLocked(string account, HttpClient httpClient)
         {
-            var isLockedResponse = httpClient.PostAsJsonAsync("api/failedCounter/IsLocked", account).Result;
+            var isLockedResponse = httpClient.PostAsJsonAsync("api/failedCounter/IsAccountLocked", account).Result;
             isLockedResponse.EnsureSuccessStatusCode();
             var isLocked = isLockedResponse.Content.ReadAsAsync<bool>().Result;
             return isLocked;
@@ -119,18 +136,6 @@ namespace DependencyInjectionWorkshop.Models
 
             var pwdHashFromInput = hash.ToString();
             return pwdHashFromInput;
-        }
-
-        private static string GetPwdFromDb(string account)
-        {
-            string pwdHashFromDb;
-            using (var connection = new SqlConnection("my connection string"))
-            {
-                pwdHashFromDb = connection.Query<string>("spGetUserPassword", new {Id = account},
-                    commandType: CommandType.StoredProcedure).SingleOrDefault();
-            }
-
-            return pwdHashFromDb;
         }
     }
 
