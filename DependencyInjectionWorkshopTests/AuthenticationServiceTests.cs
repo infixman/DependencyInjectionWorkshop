@@ -89,13 +89,13 @@ namespace DependencyInjectionWorkshopTests
         public void account_is_lock()
         {
             GivenAccountIsLocked();
-            ShouldThorwsException();
+            ShouldThrowsException<FailedTooManyTimesException>();
         }
 
-        private void ShouldThorwsException()
+        private void ShouldThrowsException<TException>() where TException : Exception
         {
             TestDelegate action = () => WhenValid();
-            Assert.Throws<FailedTooManyTimesException>(action);
+            Assert.Throws<TException>(action);
         }
 
         private void GivenAccountIsLocked()
