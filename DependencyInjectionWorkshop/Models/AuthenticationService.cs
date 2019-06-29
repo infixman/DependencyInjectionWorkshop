@@ -11,16 +11,16 @@ namespace DependencyInjectionWorkshop.Models
 {
     public class ProfileDao
     {
-        public string GetPwdFromDb(string account)
+        public string GetPassword(string account)
         {
-            string pwdHashFromDb;
+            string password;
             using (var connection = new SqlConnection("my connection string"))
             {
-                pwdHashFromDb = connection.Query<string>("spGetUserPassword", new {Id = account},
+                password = connection.Query<string>("spGetUserPassword", new {Id = account},
                     commandType: CommandType.StoredProcedure).SingleOrDefault();
             }
 
-            return pwdHashFromDb;
+            return password;
         }
     }
 
@@ -40,7 +40,7 @@ namespace DependencyInjectionWorkshop.Models
             }
 
             //從DB撈使用者密碼
-            var pwdFromDb = _profileDao.GetPwdFromDb(account);
+            var pwdFromDb = _profileDao.GetPassword(account);
 
             //將使用者輸入的密碼HASH一下
             var hashPwd = GetHashPwd(password);
