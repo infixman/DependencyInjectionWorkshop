@@ -28,14 +28,7 @@ namespace DependencyInjectionWorkshop.Models
             var pwdHashFromDb = GetPwdHashFromDb(account);
 
             //將使用者輸入的密碼HASH一下
-            var crypt = new System.Security.Cryptography.SHA256Managed();
-            var hash = new StringBuilder();
-            var crypto = crypt.ComputeHash(Encoding.UTF8.GetBytes(password));
-            foreach (var theByte in crypto)
-            {
-                hash.Append(theByte.ToString("x2"));
-            }
-            var pwdHashFromInput = hash.ToString();
+            var pwdHashFromInput = GetPwdHashFromInput(password);
 
             //從API取得目前的OTP
             string otpFromApi;
@@ -79,6 +72,20 @@ namespace DependencyInjectionWorkshop.Models
 
                 return false;
             }
+        }
+
+        private static string GetPwdHashFromInput(string password)
+        {
+            var crypt = new System.Security.Cryptography.SHA256Managed();
+            var hash = new StringBuilder();
+            var crypto = crypt.ComputeHash(Encoding.UTF8.GetBytes(password));
+            foreach (var theByte in crypto)
+            {
+                hash.Append(theByte.ToString("x2"));
+            }
+
+            var pwdHashFromInput = hash.ToString();
+            return pwdHashFromInput;
         }
 
         private static string GetPwdHashFromDb(string account)
