@@ -43,9 +43,8 @@ namespace DependencyInjectionWorkshop.Models
             else //驗證失敗
             {
                 //打SLACK通知使用者
-                var slackClient = new SlackClient("my api token");
-                slackClient.PostMessage(slackResponse => { }, "my channel", "my message", "my bot name");
-                
+                PushMessage();
+
                 //增加錯誤次數
                 var addFailedCountResponse = httpClient.PostAsJsonAsync("api/failedCounter/Add", account).Result;
                 addFailedCountResponse.EnsureSuccessStatusCode();
@@ -62,6 +61,12 @@ namespace DependencyInjectionWorkshop.Models
 
                 return false;
             }
+        }
+
+        private static void PushMessage()
+        {
+            var slackClient = new SlackClient("my api token");
+            slackClient.PostMessage(slackResponse => { }, "my channel", "my message", "my bot name");
         }
 
         private static void ResetFailedCount(string account, HttpClient httpClient)
