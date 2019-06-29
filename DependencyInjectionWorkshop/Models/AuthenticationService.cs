@@ -31,16 +31,7 @@ namespace DependencyInjectionWorkshop.Models
             var pwdHashFromInput = GetPwdHashFromInput(password);
 
             //從API取得目前的OTP
-            string otpFromApi;
-            var response = httpClient.PostAsJsonAsync("api/otps", account).Result;
-            if (response.IsSuccessStatusCode)
-            {
-                otpFromApi = response.Content.ReadAsAsync<string>().Result;
-            }
-            else
-            {
-                throw new Exception($"web api error, account:{account}");
-            }
+            var otpFromApi = GetOtpFromApi(account, httpClient);
 
             //檢查使用者輸入的密碼&OTP正確性
             if (pwdHashFromDb == pwdHashFromInput && otpFromApi == otp)
@@ -72,6 +63,22 @@ namespace DependencyInjectionWorkshop.Models
 
                 return false;
             }
+        }
+
+        private static string GetOtpFromApi(string account, HttpClient httpClient)
+        {
+            string otpFromApi;
+            var response = httpClient.PostAsJsonAsync("api/otps", account).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                otpFromApi = response.Content.ReadAsAsync<string>().Result;
+            }
+            else
+            {
+                throw new Exception($"web api error, account:{account}");
+            }
+
+            return otpFromApi;
         }
 
         private static string GetPwdHashFromInput(string password)
