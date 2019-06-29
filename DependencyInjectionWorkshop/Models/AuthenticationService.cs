@@ -74,12 +74,22 @@ namespace DependencyInjectionWorkshop.Models
         }
     }
 
+    public class SlackAdapter
+    {
+        private void PushMessage(string account)
+        {
+            var slackClient = new SlackClient("my api token");
+            slackClient.PostMessage(slackResponse => { }, "my channel", $"{account} message", "my bot name");
+        }
+    }
+
     public class AuthenticationService
     {
         private readonly ProfileDao _profileDao = new ProfileDao();
         private readonly Sha256Adapter _sha256Adapter = new Sha256Adapter();
         private readonly OtpService _otpService = new OtpService();
         private readonly FailedCounter _failedCounter = new FailedCounter();
+        private readonly SlackAdapter _slackAdapter = new SlackAdapter();
 
         public bool Verify(string account, string password, string otp)
         {
@@ -109,7 +119,7 @@ namespace DependencyInjectionWorkshop.Models
             else //驗證失敗
             {
                 //打SLACK通知使用者
-                PushMessage(account);
+                _slackAdapter.PushMessage(account);
 
                 //增加錯誤次數
                 _failedCounter.AddFailedCount(account);
@@ -139,12 +149,6 @@ namespace DependencyInjectionWorkshop.Models
             //LOG錯誤次數
             var logger = NLog.LogManager.GetCurrentClassLogger();
             logger.Info($"accountId:{account} failed times:{failedCount}");
-        }
-
-        private static void PushMessage(string account)
-        {
-            var slackClient = new SlackClient("my api token");
-            slackClient.PostMessage(slackResponse => { }, "my channel", $"{account} message", "my bot name");
         }
     }
 
