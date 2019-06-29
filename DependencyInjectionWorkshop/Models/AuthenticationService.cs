@@ -2,6 +2,17 @@
 
 namespace DependencyInjectionWorkshop.Models
 {
+    public class FailedCounterDecorator
+    {
+        private static void CheckAccIsLocked(string account, IFailedCounter failedCounter)
+        {
+            if (failedCounter.IsAccountLocked(account))
+            {
+                throw new FailedTooManyTimesException();
+            }
+        }
+    }
+
     public class AuthenticationService : IAuthentication
     {
         private readonly IProfile _profile;
@@ -31,7 +42,7 @@ namespace DependencyInjectionWorkshop.Models
         public bool Verify(string account, string password, string otp)
         {
             //檢查帳號是否被鎖定
-            CheckAccIsLocked(account, _failedCounter);
+            FailedCounterDecorator.CheckAccIsLocked(account, _failedCounter);
 
             //從DB撈使用者密碼
             var pwdFromDb = _profile.GetPassword(account);
@@ -59,14 +70,6 @@ namespace DependencyInjectionWorkshop.Models
                 _logger.Info($"accountId:{account} failed times:{failedCount}");
 
                 return false;
-            }
-        }
-
-        private void CheckAccIsLocked(string account, IFailedCounter failedCounter)
-        {
-            if (failedCounter.IsAccountLocked(account))
-            {
-                throw new FailedTooManyTimesException();
             }
         }
     }
