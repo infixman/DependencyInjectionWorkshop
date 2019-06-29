@@ -43,12 +43,17 @@ namespace DependencyInjectionWorkshop.Models
 
             if (pwdHashFromDb == pwdHashFromInput && otpFromApi == otp)
             {
+                var resetResponse = httpClient.PostAsJsonAsync("api/failedCounter/Reset", account).Result;
+                resetResponse.EnsureSuccessStatusCode();
                 return true;
             }
             else
             {
                 var slackClient = new SlackClient("my api token");
                 slackClient.PostMessage(slackResponse => { }, "my channel", "my message", "my bot name");
+
+                var addFailedCountResponse = httpClient.PostAsJsonAsync("api/failedCounter/Add", account).Result;
+                addFailedCountResponse.EnsureSuccessStatusCode();
                 return false;
             }
         }
