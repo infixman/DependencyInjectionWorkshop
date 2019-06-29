@@ -4,14 +4,14 @@ namespace DependencyInjectionWorkshop.Models
 {
     public class NotificationDecorator
     {
-        private INotification _notification;
+        private static INotification _notification;
 
         public NotificationDecorator(INotification notification)
         {
             _notification = notification;
         }
 
-        public void PushMsg(string account)
+        public static void PushMsg(string account)
         {
             _notification.PushMessage(account);
         }
@@ -73,7 +73,7 @@ namespace DependencyInjectionWorkshop.Models
             else //驗證失敗
             {
                 //打SLACK通知使用者
-                NotificationDecorator.PushMsg(account, _notification);
+                NotificationDecorator.PushMsg(account);
 
                 //增加錯誤次數
                 _failedCounter.AddFailedCount(account);
