@@ -4,8 +4,11 @@ namespace DependencyInjectionWorkshop.Models
 {
     public class NotificationDecorator
     {
-        public static void PushMsg(string account, INotification notification)
+        private INotification _notification;
+
+        public void PushMsg(string account, INotification notification)
         {
+            _notification = notification;
             notification.PushMessage(account);
         }
     }
