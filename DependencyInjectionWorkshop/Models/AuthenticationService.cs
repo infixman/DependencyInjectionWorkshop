@@ -4,10 +4,12 @@ namespace DependencyInjectionWorkshop.Models
 {
     public class FailedCounterDecorator : IAuthentication
     {
+        private readonly IAuthentication _authentication;
         private readonly IFailedCounter _failedCounter;
 
-        public FailedCounterDecorator(IFailedCounter failedCounter)
+        public FailedCounterDecorator(IAuthentication authentication, IFailedCounter failedCounter)
         {
+            _authentication = authentication;
             _failedCounter = failedCounter;
         }
 
