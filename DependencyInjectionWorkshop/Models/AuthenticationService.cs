@@ -42,7 +42,7 @@ namespace DependencyInjectionWorkshop.Models
         public bool Verify(string account, string password, string otp)
         {
             //檢查帳號是否被鎖定
-            FailedCounterDecorator.CheckAccIsLocked(account, _failedCounter);
+            //FailedCounterDecorator.CheckAccIsLocked(account, _failedCounter);
 
             //從DB撈使用者密碼
             var pwdFromDb = _profile.GetPassword(account);
