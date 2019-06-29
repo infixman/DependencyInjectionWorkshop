@@ -6,10 +6,9 @@ namespace DependencyInjectionWorkshop.Models
     {
         private INotification _notification;
 
-        public void PushMsg(string account, INotification notification)
+        public void PushMsg(string account)
         {
-            _notification = notification;
-            notification.PushMessage(account);
+            _notification.PushMessage(account);
         }
     }
 
