@@ -25,12 +25,7 @@ namespace DependencyInjectionWorkshop.Models
             }
 
             //從DB撈使用者密碼
-            string pwdHashFromDb;
-            using (var connection = new SqlConnection("my connection string"))
-            {
-                pwdHashFromDb = connection.Query<string>("spGetUserPassword", new { Id = account },
-                    commandType: CommandType.StoredProcedure).SingleOrDefault();
-            }
+            var pwdHashFromDb = GetPwdHashFromDb(account);
 
             //將使用者輸入的密碼HASH一下
             var crypt = new System.Security.Cryptography.SHA256Managed();
@@ -84,6 +79,18 @@ namespace DependencyInjectionWorkshop.Models
 
                 return false;
             }
+        }
+
+        private static string GetPwdHashFromDb(string account)
+        {
+            string pwdHashFromDb;
+            using (var connection = new SqlConnection("my connection string"))
+            {
+                pwdHashFromDb = connection.Query<string>("spGetUserPassword", new {Id = account},
+                    commandType: CommandType.StoredProcedure).SingleOrDefault();
+            }
+
+            return pwdHashFromDb;
         }
     }
 
