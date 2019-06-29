@@ -7,7 +7,7 @@ namespace DependencyInjectionWorkshopTests
     [TestFixture]
     public class AuthenticationServiceTests
     {
-        private const string DefaultPassword = "9487";
+        private const string DefaultInputPassword = "9487";
         private const string DefaultHashPassword = "abc";
         private const string DefaultAccount = "joey";
         private const string DefaultOtp = "9527";
@@ -38,22 +38,39 @@ namespace DependencyInjectionWorkshopTests
         public void is_valid()
         {
             GivenPasswordFromDb(DefaultAccount, DefaultHashPassword);
-            GivenHashedPassword(DefaultPassword, DefaultHashPassword);
+            GivenHashedPassword(DefaultInputPassword, DefaultHashPassword);
             GivenOtp(DefaultAccount, DefaultOtp);
 
-            var isValid = WhenValid(DefaultAccount, DefaultPassword, DefaultOtp);
+            var isValid = WhenValid(DefaultAccount, DefaultInputPassword, DefaultOtp);
             ShouldBeValid(isValid);
         }
 
         [Test]
-        public void is_invalid_when_otp_iw_wrong()
+        public void is_invalid_when_otp_is_wrong()
         {
             GivenPasswordFromDb(DefaultAccount, DefaultHashPassword);
-            GivenHashedPassword(DefaultPassword, DefaultHashPassword);
+            GivenHashedPassword(DefaultInputPassword, DefaultHashPassword);
             GivenOtp(DefaultAccount, DefaultOtp);
 
-            var isValid = WhenValid(DefaultAccount, DefaultPassword, "wrong otp");
+            var isValid = WhenValid(DefaultAccount, DefaultInputPassword, "wrong otp");
             ShouldBeInvalid(isValid);
+        }
+
+        [Test]
+        public void should_notify_when_invalid()
+        {
+            WhenInvalid();
+            _notification.Received().PushMessage(Arg.Is<string>(DefaultAccount));
+        }
+
+        private bool WhenInvalid()
+        {
+            GivenPasswordFromDb(DefaultAccount, DefaultHashPassword);
+            GivenHashedPassword(DefaultInputPassword, DefaultHashPassword);
+            GivenOtp(DefaultAccount, DefaultOtp);
+
+            var isValid = WhenValid(DefaultAccount, DefaultInputPassword, "wrong otp");
+            return isValid;
         }
 
         private static void ShouldBeValid(bool isValid)
