@@ -30,10 +30,13 @@ namespace DependencyInjectionWorkshopTests
             _failedCounter = Substitute.For<IFailedCounter>();
             _notification = Substitute.For<INotification>();
             _logger = Substitute.For<ILogger>();
-
+            
+            //先初始化一個最基本的Service
             var authentication = 
                 new AuthenticationService(_profile, _hash, _otpService, _failedCounter, 
                     _notification, _logger);
+            
+            //然後裝飾他
             _authentication = new NotificationDecorator(authentication, _notification);
         }
 
