@@ -13,17 +13,10 @@ namespace DependencyInjectionWorkshop.Models
             _failedCounter = failedCounter;
         }
 
-        private void CheckAccIsLocked(string account)
-        {
-            if (_failedCounter.IsAccountLocked(account))
-            {
-                throw new FailedTooManyTimesException();
-            }
-        }
-
         public bool Verify(string account, string password, string otp)
         {
-            throw new NotImplementedException();
+            _failedCounter.IsAccountLocked(account);
+            return _authentication.Verify(account, password, otp);
         }
     }
 
