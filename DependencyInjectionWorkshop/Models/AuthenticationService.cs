@@ -9,16 +9,16 @@ namespace DependencyInjectionWorkshop.Models
         private readonly OtpService _otpService;
         private readonly FailedCounter _failedCounter;
         private readonly SlackAdapter _slackAdapter;
-        private readonly NLogAdapter _nLogAdapter;
+        private readonly ILogger _logger;
 
-        public AuthenticationService(ProfileDao profileDao, Sha256Adapter sha256Adapter, OtpService otpService, FailedCounter failedCounter, SlackAdapter slackAdapter, NLogAdapter nLogAdapter)
+        public AuthenticationService(ProfileDao profileDao, Sha256Adapter sha256Adapter, OtpService otpService, FailedCounter failedCounter, SlackAdapter slackAdapter, ILogger logger)
         {
             _profileDao = profileDao;
             _sha256Adapter = sha256Adapter;
             _otpService = otpService;
             _failedCounter = failedCounter;
             _slackAdapter = slackAdapter;
-            _nLogAdapter = nLogAdapter;
+            _logger = logger;
         }
 
         public AuthenticationService()
@@ -28,7 +28,7 @@ namespace DependencyInjectionWorkshop.Models
             _otpService = new OtpService();
             _failedCounter = new FailedCounter();
             _slackAdapter = new SlackAdapter();
-            _nLogAdapter = new NLogAdapter();
+            _logger = new NLogAdapter();
         }
 
         public bool Verify(string account, string password, string otp)
@@ -65,7 +65,7 @@ namespace DependencyInjectionWorkshop.Models
 
                 //紀錄錯誤次數
                 var failedCount = _failedCounter.GetFailedCount(account);
-                _nLogAdapter.Info($"accountId:{account} failed times:{failedCount}");
+                _logger.Info($"accountId:{account} failed times:{failedCount}");
 
                 return false;
             }
