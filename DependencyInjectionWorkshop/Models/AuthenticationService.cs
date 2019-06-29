@@ -48,18 +48,23 @@ namespace DependencyInjectionWorkshop.Models
                 //增加錯誤次數
                 AddFailedCount(account, httpClient);
 
-                //取得最新錯誤次數
-                var failedCountResponse =
-                    httpClient.PostAsJsonAsync("api/failedCounter/GetFailedCount", account).Result;
-                failedCountResponse.EnsureSuccessStatusCode();
-                var failedCount = failedCountResponse.Content.ReadAsAsync<int>().Result;
-                
-                //LOG錯誤次數
-                var logger = NLog.LogManager.GetCurrentClassLogger();
-                logger.Info($"accountId:{account} failed times:{failedCount}");
+                //紀錄錯誤次數
+                LogFailedCount(account, httpClient);
 
                 return false;
             }
+        }
+
+        private static void LogFailedCount(string account, HttpClient httpClient)
+        {
+            var failedCountResponse =
+                httpClient.PostAsJsonAsync("api/failedCounter/GetFailedCount", account).Result;
+            failedCountResponse.EnsureSuccessStatusCode();
+            var failedCount = failedCountResponse.Content.ReadAsAsync<int>().Result;
+
+            //LOG錯誤次數
+            var logger = NLog.LogManager.GetCurrentClassLogger();
+            logger.Info($"accountId:{account} failed times:{failedCount}");
         }
 
         private static void AddFailedCount(string account, HttpClient httpClient)
