@@ -15,8 +15,17 @@ namespace DependencyInjectionWorkshop.Models
 
         public bool Verify(string account, string password, string otp)
         {
-            _failedCounter.IsAccountLocked(account);
+            CheckAccountIsLocked(account);
             return _authentication.Verify(account, password, otp);
+        }
+
+        private void CheckAccountIsLocked(string accountId)
+        {
+            var isLocked = _failedCounter.IsAccountLocked(accountId);
+            if (isLocked)
+            {
+                throw new FailedTooManyTimesException();
+            }
         }
     }
 
