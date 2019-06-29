@@ -71,7 +71,7 @@ namespace DependencyInjectionWorkshop.Models
             }
         }
 
-        private void PushMsg(string account, INotification notification)
+        private static void PushMsg(string account, INotification notification)
         {
             notification.PushMessage(account);
         }
