@@ -4,7 +4,12 @@ namespace DependencyInjectionWorkshop.Models
 {
     public class FailedCounterDecorator
     {
-        private IFailedCounter _failedCounter;
+        private readonly IFailedCounter _failedCounter;
+
+        public FailedCounterDecorator(IFailedCounter failedCounter)
+        {
+            _failedCounter = failedCounter;
+        }
 
         private void CheckAccIsLocked(string account)
         {
