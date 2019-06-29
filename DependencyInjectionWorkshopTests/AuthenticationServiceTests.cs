@@ -63,6 +63,18 @@ namespace DependencyInjectionWorkshopTests
             ShouldNotify(DefaultAccount);
         }
 
+        [Test]
+        public void should_add_fail_count_when_invalid()
+        {
+            WhenInvalid();
+            ShouldAddFailCount(DefaultAccount);
+        }
+
+        private void ShouldAddFailCount(string account)
+        {
+            _failedCounter.Received().AddFailedCount(account);
+        }
+
         private void ShouldNotify(string account)
         {
             _notification.Received().PushMessage(Arg.Is<string>(account));
