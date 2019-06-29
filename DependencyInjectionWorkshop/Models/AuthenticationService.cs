@@ -59,11 +59,21 @@ namespace DependencyInjectionWorkshop.Models
         }
     }
 
+    public class FailedCounter
+    {
+        public void ResetFailedCount(string account)
+        {
+            var resetResponse = new HttpClient() { BaseAddress = new Uri("http://joey.com/") }.PostAsJsonAsync("api/failedCounter/Reset", account).Result;
+            resetResponse.EnsureSuccessStatusCode();
+        }
+    }
+
     public class AuthenticationService
     {
         private readonly ProfileDao _profileDao = new ProfileDao();
         private readonly Sha256Adapter _sha256Adapter = new Sha256Adapter();
         private readonly OtpService _otpService = new OtpService();
+        private readonly FailedCounter _failedCounter = new FailedCounter();
 
         public bool Verify(string account, string password, string otp)
         {
@@ -83,11 +93,11 @@ namespace DependencyInjectionWorkshop.Models
             //從API取得目前的OTP
             var otpFromApi = _otpService.GetCurrentOtp(account);
 
-            //檢查使用者輸入的密碼&OTP正確性
+            //檢查使用者輸入的密碼 & OTP正確性
             if (pwdFromDb == hashPwd && otpFromApi == otp)
             {
                 //驗證成功，歸零錯誤次數
-                ResetFailedCount(account);
+                _failedCounter.ResetFailedCount(account);
                 return true;
             }
             else //驗證失敗
@@ -135,12 +145,6 @@ namespace DependencyInjectionWorkshop.Models
         {
             var slackClient = new SlackClient("my api token");
             slackClient.PostMessage(slackResponse => { }, "my channel", $"{account} message", "my bot name");
-        }
-
-        private static void ResetFailedCount(string account)
-        {
-            var resetResponse = new HttpClient() { BaseAddress = new Uri("http://joey.com/") }.PostAsJsonAsync("api/failedCounter/Reset", account).Result;
-            resetResponse.EnsureSuccessStatusCode();
         }
     }
 
