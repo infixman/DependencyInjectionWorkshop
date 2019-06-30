@@ -42,15 +42,10 @@ namespace DependencyInjectionWorkshop.Models
             //檢查使用者輸入的密碼 & OTP正確性
             if (pwdFromDb == hashPwd && otpFromApi == otp)
             {
-                //驗證成功，歸零錯誤次數
-                _failedCounter.ResetFailedCount(account);
                 return true;
             }
             else //驗證失敗
             {
-                //增加錯誤次數
-                _failedCounter.AddFailedCount(account);
-
                 //紀錄錯誤次數
                 var failedCount = _failedCounter.GetFailedCount(account);
                 _logger.Info($"accountId:{account} failed times:{failedCount}");
