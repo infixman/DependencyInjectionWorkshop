@@ -36,7 +36,7 @@ namespace DependencyInjectionWorkshopTests
                 new AuthenticationService(_profile, _hash, _otpService, _failedCounter, 
                     _notification, _logger);
             
-            //然後裝飾他
+            //然後裝飾他，越後面越先執行
             var notificationDecorator = new NotificationDecorator(authentication, _notification); 
             _authentication = new FailedCounterDecorator(notificationDecorator, _failedCounter);
         }

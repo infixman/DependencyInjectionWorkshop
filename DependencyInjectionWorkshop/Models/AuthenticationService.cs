@@ -2,32 +2,6 @@
 
 namespace DependencyInjectionWorkshop.Models
 {
-    public class FailedCounterDecorator : IAuthentication
-    {
-        private readonly IAuthentication _authentication;
-        private readonly IFailedCounter _failedCounter;
-
-        public FailedCounterDecorator(IAuthentication authentication, IFailedCounter failedCounter)
-        {
-            _authentication = authentication;
-            _failedCounter = failedCounter;
-        }
-
-        public bool Verify(string account, string password, string otp)
-        {
-            CheckAccountIsLocked(account);
-            return _authentication.Verify(account, password, otp);
-        }
-
-        private void CheckAccountIsLocked(string account)
-        {
-            if (_failedCounter.IsAccountLocked(account))
-            {
-                throw new FailedTooManyTimesException();
-            }
-        }
-    }
-
     public class AuthenticationService : IAuthentication
     {
         private readonly IProfile _profile;
