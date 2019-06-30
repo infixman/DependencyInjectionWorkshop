@@ -145,8 +145,7 @@ namespace DependencyInjectionWorkshopTests
             GivenHashedPassword(DefaultInputPassword, DefaultHashPassword);
             GivenOtp(DefaultAccount, DefaultOtp);
 
-            var isValid = WhenValid(DefaultAccount, DefaultInputPassword, "wrong otp");
-            return isValid;
+            return WhenValid(DefaultAccount, DefaultInputPassword, "wrong otp");
         }
 
         private static void ShouldBeValid(bool isValid)
