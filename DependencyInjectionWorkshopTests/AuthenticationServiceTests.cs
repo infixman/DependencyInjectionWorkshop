@@ -32,13 +32,12 @@ namespace DependencyInjectionWorkshopTests
             _logger = Substitute.For<ILogger>();
             
             //先初始化一個最基本的Service
-            var authentication = 
-                new AuthenticationService(_profile, _hash, _otpService, _failedCounter, 
-                    _notification, _logger);
+            var authentication = new AuthenticationService(_profile, _hash, _otpService);
             
             //然後裝飾他，越後面越先執行
             var notificationDecorator = new NotificationDecorator(authentication, _notification); 
-            _authentication = new FailedCounterDecorator(notificationDecorator, _failedCounter);
+            var failedCounterDecorator= new FailedCounterDecorator(notificationDecorator, _failedCounter);
+            _authentication = new LogFailedCounterDecorator(failedCounterDecorator, _failedCounter, _logger);
         }
 
         [Test]

@@ -7,16 +7,12 @@ namespace DependencyInjectionWorkshop.Models
         private readonly IProfile _profile;
         private readonly IHash _hash;
         private readonly IOtpService _otpService;
-        private readonly IFailedCounter _failedCounter;
-        private readonly ILogger _logger;
 
-        public AuthenticationService(IProfile profile, IHash hash, IOtpService otpService, IFailedCounter failedCounter, INotification notification, ILogger logger)
+        public AuthenticationService(IProfile profile, IHash hash, IOtpService otpService)
         {
             _profile = profile;
             _hash = hash;
             _otpService = otpService;
-            _failedCounter = failedCounter;
-            _logger = logger;
         }
 
         public AuthenticationService()
@@ -24,8 +20,6 @@ namespace DependencyInjectionWorkshop.Models
             _profile = new ProfileDao();
             _hash = new Sha256Adapter();
             _otpService = new OtpService();
-            _failedCounter = new FailedCounter();
-            _logger = new NLogAdapter();
         }
 
         public bool Verify(string account, string password, string otp)
@@ -46,10 +40,6 @@ namespace DependencyInjectionWorkshop.Models
             }
             else //驗證失敗
             {
-                //紀錄錯誤次數
-                var failedCount = _failedCounter.GetFailedCount(account);
-                _logger.Info($"accountId:{account} failed times:{failedCount}");
-
                 return false;
             }
         }
