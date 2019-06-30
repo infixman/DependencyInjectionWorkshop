@@ -111,13 +111,13 @@ namespace DependencyInjectionWorkshopTests
 
         private void ShouldLog(string account)
         {
-            _logger.Received().Info(Arg.Is<string>(m => m.Contains(account)));
+            _logger.Received(1).Info(Arg.Is<string>(m => m.Contains(account)));
         }
 
 
         private void ShouldResetFailCount(string account)
         {
-            _failedCounter.Received().ResetFailedCount(account);
+            _failedCounter.Received(1).ResetFailedCount(account);
         }
 
         private bool WhenValid()
@@ -132,12 +132,12 @@ namespace DependencyInjectionWorkshopTests
 
         private void ShouldAddFailCount(string account)
         {
-            _failedCounter.Received().AddFailedCount(account);
+            _failedCounter.Received(1).AddFailedCount(account);
         }
 
         private void ShouldNotify(string account)
         {
-            _notification.Received().PushMessage(Arg.Is<string>(account));
+            _notification.Received(1).PushMessage(Arg.Is<string>(account));
         }
 
         private bool WhenInvalid()
