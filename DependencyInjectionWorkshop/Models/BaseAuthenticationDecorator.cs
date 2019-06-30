@@ -1,10 +1,10 @@
 ﻿namespace DependencyInjectionWorkshop.Models
 {
-    public class BaseAuthenticationDecorator : IAuthentication
+    public abstract class BaseAuthenticationDecorator : IAuthentication
     {
         private readonly IAuthentication _authentication;
 
-        public BaseAuthenticationDecorator(IAuthentication authentication)
+        protected BaseAuthenticationDecorator(IAuthentication authentication)
         {
             _authentication = authentication;
         }
