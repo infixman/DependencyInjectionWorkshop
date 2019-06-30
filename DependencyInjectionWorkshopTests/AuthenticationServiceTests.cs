@@ -37,7 +37,7 @@ namespace DependencyInjectionWorkshopTests
             //然後裝飾他，越後面越先執行
             var notificationDecorator = new NotificationDecorator(authentication, _notification); 
             var failedCounterDecorator= new FailedCounterDecorator(notificationDecorator, _failedCounter);
-            _authentication = new LogFailedCounterDecorator(failedCounterDecorator, _failedCounter, _logger);
+            _authentication = new LogFailedCountDecorator(failedCounterDecorator, _failedCounter, _logger);
         }
 
         [Test]

@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,35 +10,124 @@ namespace MyConsole
 {
     class Program
     {
-        private static AuthenticationService _authenticationService;
+        //static void Main(string[] args)
+        //{
+        //    IProfile profile = new ProfileDao();
+        //    IHash hash = new Sha256Adapter();
+        //    IOtpService otpService = new OtpService();
+        //    IFailedCounter failedCounter = new FailedCounter();
+        //    ILogger logger = new NLogAdapter();
+        //    INotification notification = new SlackAdapter();
 
-        private static void Main(string[] args)
+        //    var authenticationService =
+        //        new AuthenticationService(profile, hash, otpService);
+
+        //    var notificationDecorator = new NotificationDecorator(authenticationService, notification);
+        //    var failedCounterDecorator = new FailedCounterDecorator(failedCounter,notificationDecorator);
+        //    var logDecorator = new LogFailedCountDecorator(failedCounterDecorator,failedCounter,logger);
+
+        //    var finalAuthentication = logDecorator;
+
+        //    var isValid = finalAuthentication.Verify("joey", "pw", "123457");
+
+        //    Console.WriteLine(isValid);
+        //}
+
+        static void Main(string[] args)
         {
-            Verify("joey", "9487", "9527");
+            IProfile profile = new FakeProfile();
+            //IProfile profile = new ProfileRepo();
+            IHash hash = new FakeHash();
+            //IHash hash = new Sha256Adapter();
+            IOtpService otpService = new FakeOtp();
+            //IOtp otpService = new OtpService();
+            IFailedCounter failedCounter = new FakeFailedCounter();
+            //IFailedCounter failedCounter = new FailedCounter();
+            ILogger logger = new ConsoleAdapter();
+            //ILogger logger = new NLogAdapter();
+            INotification notification = new FakeSlack();
+            //INotification notification = new SlackAdapter();
+
+            var authenticationService =
+                new AuthenticationService(profile, hash, otpService);
+
+            var notificationDecorator = new NotificationDecorator(authenticationService, notification);
+            var failedCounterDecorator = new FailedCounterDecorator(notificationDecorator, failedCounter);
+            var logDecorator = new LogFailedCountDecorator(failedCounterDecorator, failedCounter, logger);
+
+            var finalAuthentication = logDecorator;
+
+            var isValid = finalAuthentication.Verify("joey", "pw", "123457");
+
+            Console.WriteLine(isValid);
+        }
+    }
+
+    internal class ConsoleAdapter : ILogger
+    {
+        public void Info(string message)
+        {
+            Console.WriteLine(message);
+        }
+    }
+
+    internal class FakeSlack : INotification
+    {
+        public void PushMessage(string message)
+        {
+            Console.WriteLine($"{nameof(FakeSlack)}.{nameof(PushMessage)}({message})");
+        }
+    }
+
+    internal class FakeFailedCounter : IFailedCounter
+    {
+        public void ResetFailedCount(string accountId)
+        {
+            Console.WriteLine($"{nameof(FakeFailedCounter)}.{nameof(ResetFailedCount)}({accountId})");
         }
 
-        private static void Verify(string account, string password, string otp)
+        public void AddFailedCount(string accountId)
         {
-            var failedCounter = new FailedCounter();
-            var authentication = 
-                new AuthenticationService(
-                    new ProfileDao(), 
-                    new Sha256Adapter(), 
-                    new OtpService());
+            Console.WriteLine($"{nameof(FakeFailedCounter)}.{nameof(AddFailedCount)}({accountId})");
+        }
 
-            var notificationDecorator = 
-                new NotificationDecorator(authentication, 
-                new SlackAdapter());
+        public int GetFailedCount(string accountId)
+        {
+            Console.WriteLine($"{nameof(FakeFailedCounter)}.{nameof(GetFailedCount)}({accountId})");
+            return 91;
+        }
 
-            var failedCounterDecorator = 
-                new FailedCounterDecorator(notificationDecorator, 
-                failedCounter);
+        public bool IsAccountLocked(string accountId)
+        {
+            Console.WriteLine($"{nameof(FakeFailedCounter)}.{nameof(IsAccountLocked)}({accountId})");
+            return false;
+        }
+    }
 
-            var logFailedCounterDecorator = 
-                new LogFailedCounterDecorator(failedCounterDecorator,
-                failedCounter, new NLogAdapter());
-            
-            Console.WriteLine(logFailedCounterDecorator.Verify(account, password, otp));
+    internal class FakeOtp : IOtpService
+    {
+        public string GetCurrentOtp(string accountId)
+        {
+            Console.WriteLine($"{nameof(FakeOtp)}.{nameof(GetCurrentOtp)}({accountId})");
+            return "123456";
+        }
+    }
+
+    internal class FakeHash : IHash
+    {
+        public string Compute(string plainText)
+        {
+            Console.WriteLine($"{nameof(FakeHash)}.{nameof(Compute)}({plainText})");
+            return "my hashed password";
+        }
+    }
+
+    internal class FakeProfile : IProfile
+    {
+        public string GetPassword(string accountId)
+        {
+            Console.WriteLine($"{nameof(FakeProfile)}.{nameof(GetPassword)}({accountId})");
+            return "my hashed password";
         }
     }
 }
